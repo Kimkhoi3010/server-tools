@@ -31,18 +31,16 @@ class TimeWindowMixin(models.AbstractModel):
         for record in self:
             if record.time_window_start > record.time_window_end:
                 raise ValidationError(
-                    _("%(end_time)s must be > %(start_time)s")
-                    % (
-                        {
-                            "end_time": self.float_to_time_repr(record.time_window_end),
-                            "start_time": self.float_to_time_repr(
-                                record.time_window_start
-                            ),
-                        }
+                    self.env._(
+                        "%s must be > %s",
+                        self.float_to_time_repr(record.time_window_end),
+                        self.float_to_time_repr(record.time_window_start),
                     )
                 )
             if not record.time_window_weekday_ids:
-                raise ValidationError(_("At least one time.weekday is required"))
+                raise ValidationError(
+                    self.env._("At least one time.weekday is required")
+                )
             # here we use a plain SQL query to benefit of the numrange
             # function available in PostgresSQL
             # (http://www.postgresql.org/docs/current/static/rangetypes.html)
@@ -79,12 +77,8 @@ class TimeWindowMixin(models.AbstractModel):
             if res:
                 other = self.browse(res[0][0])
                 raise ValidationError(
-                    _("%(record_name)s overlaps %(other_name)s")
-                    % (
-                        {
-                            "record_name": record.display_name,
-                            "other_name": other.display_name,
-                        }
+                    self.env._(
+                        "%s overlaps %s", record.display_name, other.display_name
                     )
                 )
 
